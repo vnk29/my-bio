@@ -1031,10 +1031,6 @@ export default function Admin() {
                 {loggingIn ? "Logging in..." : "Login"}
               </Button>
             </form>
-
-            <p className="text-xs text-gray-400 text-center mt-4">
-              Credentials: admin / admin123
-            </p>
           </Card>
         </motion.div>
       </div>

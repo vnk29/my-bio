@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSiteContent } from '@/hooks/use-site-content';
-import { ArrowRight, 
+import { ArrowLeft, ArrowRight, 
   Rocket,
   MapPin,
   GraduationCap,
@@ -118,7 +118,7 @@ export const JourneyEnhanced = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent"
             >
               {item.title}
             </motion.h2>
@@ -128,7 +128,7 @@ export const JourneyEnhanced = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
-              className="text-xl text-muted-foreground leading-relaxed mb-8 max-w-xl mx-auto"
+              className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed mb-8 max-w-xl mx-auto px-4"
             >
               {item.description}
             </motion.p>
@@ -171,9 +171,9 @@ export const JourneyEnhanced = () => {
           }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="absolute left-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-primary/20 hover:bg-primary/40 border border-primary/30 transition-all"
+          className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-primary/20 hover:bg-primary/40 border border-primary/30 transition-all z-20 hidden md:flex items-center justify-center"
         >
-          <ArrowRight className="w-6 h-6 text-primary rotate-180" />
+          <ArrowLeft className="w-6 h-6 text-primary" />
         </motion.button>
 
         {/* Next Button Hint */}
@@ -181,7 +181,7 @@ export const JourneyEnhanced = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="absolute right-6 top-1/2 -translate-y-1/2 text-right pointer-events-none"
+          className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-right pointer-events-none hidden md:block"
         >
           <p className="text-sm text-primary/60 mb-2">Click to advance</p>
           <motion.div

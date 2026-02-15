@@ -105,7 +105,7 @@ export const HeroEnhanced = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-5xl md:text-7xl font-bold mb-4"
+          className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4 leading-tight"
         >
           <span className="bg-gradient-to-r from-primary via-accent to-blue-500 bg-clip-text text-transparent">
             {nameText}
@@ -124,7 +124,7 @@ export const HeroEnhanced = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-xl md:text-2xl text-gray-300 mb-2 h-8"
+          className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-2 h-8"
         >
           {roleText}
           {!roleComplete && (

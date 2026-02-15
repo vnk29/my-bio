@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import { API_BASE } from '@/lib/config';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const API = API_BASE;
 
 export interface ApiProject {
   id: string;

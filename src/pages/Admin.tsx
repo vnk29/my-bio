@@ -10,8 +10,9 @@ import { ArrowLeft, Plus, Trash2, Upload, Save, LogOut, Home, FileText, Zap, Mai
 import { motion, AnimatePresence } from "framer-motion";
 import type { SiteContent } from "@/hooks/use-site-content";
 import type { ApiProject } from "@/hooks/use-projects-api";
+import { API_BASE } from "@/lib/config";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const API = API_BASE;
 
 const defaultContent: SiteContent = {
   hero: { greeting: "Hello, I'm", name: "V NOHITH KUMAR", title: "Full-Stack Developer", bio: "", stats: [], ctaPrimary: "View Projects", ctaSecondary: "Get in Touch" },

@@ -10,9 +10,6 @@ import { ArrowLeft, Plus, Trash2, Upload, Save, LogOut, Home, FileText, Zap, Mai
 import { motion, AnimatePresence } from "framer-motion";
 import type { SiteContent } from "@/hooks/use-site-content";
 import type { ApiProject } from "@/hooks/use-projects-api";
-import { API_BASE } from "@/lib/config";
-
-const API = API_BASE;
 
 const defaultContent: SiteContent = {
   hero: { greeting: "Hello, I'm", name: "V NOHITH KUMAR", title: "Full-Stack Developer", bio: "", stats: [], ctaPrimary: "View Projects", ctaSecondary: "Get in Touch" },
@@ -451,13 +448,13 @@ const ProjectsEditor = ({ projects, content, setContent, token }: { projects: an
 
     try {
       if (editingId) {
-        await fetch(`${API}/projects/${editingId}`, {
+        await fetch(`/api/projects/${editingId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json", Authorization: token },
           body: JSON.stringify(body),
         });
       } else {
-        await fetch(`${API}/projects`, {
+        await fetch(`/api/projects`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: token },
           body: JSON.stringify(body),
@@ -475,7 +472,7 @@ const ProjectsEditor = ({ projects, content, setContent, token }: { projects: an
   const handleDeleteProject = async (id: string) => {
     if (!confirm("Delete this project?")) return;
     try {
-      await fetch(`${API}/projects/${id}`, {
+      await fetch(`/api/projects/${id}`, {
         method: "DELETE",
         headers: { Authorization: token },
       });
@@ -852,7 +849,7 @@ export default function Admin() {
     useQuery({
       queryKey: ["site-content"],
       queryFn: async () => {
-        const res = await fetch(`${API}/site-content`);
+        const res = await fetch(`/api/site-content`);
         if (!res.ok) throw new Error("Failed");
         return res.json();
       },
@@ -862,7 +859,7 @@ export default function Admin() {
   const { data: projects = [] } = useQuery({
     queryKey: ["projects-api"],
     queryFn: async () => {
-      const res = await fetch(`${API}/projects`);
+      const res = await fetch(`/api/projects`);
       if (!res.ok) throw new Error("Failed");
       return res.json();
     },
@@ -885,7 +882,7 @@ export default function Admin() {
   // Check if token is still valid by fetching content
   useEffect(() => {
     if (token) {
-      fetch(`${API}/site-content`, {
+      fetch(`/api/site-content`, {
         headers: { Authorization: token }
       }).catch(() => {
         // If fetch fails, session is likely expired
@@ -899,7 +896,7 @@ export default function Admin() {
     setLoggingIn(true);
     setLoginError("");
     try {
-      const res = await fetch(`${API}/login`, {
+      const res = await fetch(`/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginForm),
@@ -935,7 +932,7 @@ export default function Admin() {
     }
     
     try {
-      const res = await fetch(`${API}/site-content`, {
+      const res = await fetch(`/api/site-content`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

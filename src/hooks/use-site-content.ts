@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { API_BASE } from '@/lib/config';
 
-const API = API_BASE;
+const API = '/api';
 
 export interface SiteContent {
   hero?: {

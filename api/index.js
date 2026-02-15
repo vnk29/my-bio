@@ -29,11 +29,15 @@ console.log('PORT:', process.env.PORT || 4000);
 
 // Initialize Supabase client
 let supabase = null;
-if (SUPABASE_URL && SUPABASE_KEY) {
-  supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-  console.log('🔌 Supabase client initialized');
-} else {
-  console.warn('⚠️  Supabase credentials missing - some features will not work');
+try {
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('🔌 Supabase client initialized');
+  } else {
+    console.warn('⚠️  Supabase credentials missing - some features will not work');
+  }
+} catch (err) {
+  console.error('❌ Failed to initialize Supabase:', err.message);
 }
 
 // Ensure uploads directory exists
@@ -51,6 +55,19 @@ const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 app.use(cors({ origin: true, credentials: true }));
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use('/uploads', express.static(uploadsDir));
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    env: {
+      SUPABASE_URL: SUPABASE_URL ? '✅' : '❌',
+      SUPABASE_KEY: SUPABASE_KEY ? '✅' : '❌',
+      JWT_SECRET: JWT_SECRET ? '✅' : '❌',
+      ADMIN_USER: ADMIN_USER || 'admin',
+    }
+  });
+});
 
 function requireAuth(req, res, next) {
   const token = req.headers['authorization'];

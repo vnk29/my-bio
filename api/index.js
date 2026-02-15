@@ -137,13 +137,6 @@ app.put('/api/site-content', requireAuth, async (req, res) => {
   }
 });
 
-// ========== UPLOAD ==========
-app.post('/api/upload', requireAuth, upload.single('file'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-  const url = `/uploads/${req.file.filename}`;
-  res.json({ url });
-});
-
 // ========== PROJECTS ==========
 app.get('/api/projects', async (req, res) => {
   try {
@@ -322,16 +315,6 @@ app.get('/api/analytics', requireAuth, async (req, res) => {
   }
 });
 
-// ========== ERROR HANDLING ==========
-app.use((err, req, res, next) => {
-  console.error('Express error:', err);
-  res.status(500).json({ error: 'Internal server error' });
-});
-
-// Export for Vercel serverless
-module.exports = app;
-
-// For local development
 // ========== ERROR HANDLING ==========
 app.use((err, req, res, next) => {
   console.error('Express error:', err);

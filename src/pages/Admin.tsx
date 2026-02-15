@@ -451,13 +451,13 @@ const ProjectsEditor = ({ projects, content, setContent, token }: { projects: an
 
     try {
       if (editingId) {
-        await fetch(`${API}/api/projects/${editingId}`, {
+        await fetch(`${API}/projects/${editingId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json", Authorization: token },
           body: JSON.stringify(body),
         });
       } else {
-        await fetch(`${API}/api/projects`, {
+        await fetch(`${API}/projects`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: token },
           body: JSON.stringify(body),
@@ -475,7 +475,7 @@ const ProjectsEditor = ({ projects, content, setContent, token }: { projects: an
   const handleDeleteProject = async (id: string) => {
     if (!confirm("Delete this project?")) return;
     try {
-      await fetch(`${API}/api/projects/${id}`, {
+      await fetch(`${API}/projects/${id}`, {
         method: "DELETE",
         headers: { Authorization: token },
       });
@@ -852,7 +852,7 @@ export default function Admin() {
     useQuery({
       queryKey: ["site-content"],
       queryFn: async () => {
-        const res = await fetch(`${API}/api/site-content`);
+        const res = await fetch(`${API}/site-content`);
         if (!res.ok) throw new Error("Failed");
         return res.json();
       },
@@ -862,7 +862,7 @@ export default function Admin() {
   const { data: projects = [] } = useQuery({
     queryKey: ["projects-api"],
     queryFn: async () => {
-      const res = await fetch(`${API}/api/projects`);
+      const res = await fetch(`${API}/projects`);
       if (!res.ok) throw new Error("Failed");
       return res.json();
     },
@@ -885,7 +885,7 @@ export default function Admin() {
   // Check if token is still valid by fetching content
   useEffect(() => {
     if (token) {
-      fetch(`${API}/api/site-content`, {
+      fetch(`${API}/site-content`, {
         headers: { Authorization: token }
       }).catch(() => {
         // If fetch fails, session is likely expired
@@ -899,7 +899,7 @@ export default function Admin() {
     setLoggingIn(true);
     setLoginError("");
     try {
-      const res = await fetch(`${API}/api/login`, {
+      const res = await fetch(`${API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginForm),
@@ -935,7 +935,7 @@ export default function Admin() {
     }
     
     try {
-      const res = await fetch(`${API}/api/site-content`, {
+      const res = await fetch(`${API}/site-content`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

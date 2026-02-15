@@ -316,8 +316,14 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
+// Export for Vercel serverless
+module.exports = app;
+
+// For local development
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`✅ Backend running on http://localhost:${PORT}`);
-  console.log(`📦 Connected to Supabase at ${process.env.SUPABASE_URL}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`✅ Backend running on http://localhost:${PORT}`);
+    console.log(`📦 Connected to Supabase at ${process.env.SUPABASE_URL}`);
+  });
+}

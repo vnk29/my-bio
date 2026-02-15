@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { ExternalLink, Github } from 'lucide-react';
+import { ExternalLink, Github, Star, Zap } from 'lucide-react';
 import { Project } from '@/data/projects';
 
 interface ProjectCardProps {
@@ -19,8 +19,8 @@ export const ProjectCard = ({ project, index, onClick }: ProjectCardProps) => {
   const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15 });
   const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15 });
 
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["6deg", "-6deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-6deg", "6deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -57,20 +57,20 @@ export const ProjectCard = ({ project, index, onClick }: ProjectCardProps) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
-      className="relative group cursor-pointer perspective-1000 hover:z-10"
+      className="relative group cursor-pointer"
     >
-      {/* Echo glow effect - intensified on hover */}
+      {/* Glowing background effect */}
       <motion.div
-        className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"
         style={{
-          background: `linear-gradient(135deg, hsl(var(--primary) / 0.4), hsl(var(--accent) / 0.4))`,
-          filter: 'blur(24px)',
+          background: `linear-gradient(135deg, hsl(var(--primary) / 0.4), hsl(var(--accent) / 0.4), hsl(var(--primary) / 0.3))`,
+          filter: 'blur(20px)',
         }}
-        animate={isHovered ? { scale: [1, 1.08, 1] } : {}}
-        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+        animate={isHovered ? { scale: [1, 1.1, 1], opacity: [0, 100, 0] } : {}}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* Ripple effect container */}
+      {/* Ripple effect */}
       {isHovered && (
         <motion.div
           className="absolute inset-0 rounded-2xl pointer-events-none"
@@ -83,96 +83,148 @@ export const ProjectCard = ({ project, index, onClick }: ProjectCardProps) => {
         />
       )}
 
-      {/* Card content */}
+      {/* Main card */}
       <motion.div
-        className="relative bg-card border border-border rounded-2xl overflow-hidden transition-all duration-300 group-hover:border-primary/40"
-        whileHover={{ y: -4 }}
+        className="relative bg-gradient-to-br from-card to-card/80 border border-border/60 rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300 group-hover:border-primary/40"
+        whileHover={{ y: -6 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Image */}
-        <div className="relative h-48 overflow-hidden">
+        {/* Image container with parallax effect */}
+        <div className="relative h-56 overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
           <motion.img
             src={project.image}
             alt={project.title}
             className="w-full h-full object-cover"
             style={{ transform: "translateZ(20px)" }}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.08 }}
             transition={{ duration: 0.4 }}
           />
+          
+          {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
           
           {/* Category badge */}
-          <div className="absolute top-4 left-4">
-            <span className="px-3 py-1 text-xs font-medium bg-primary/20 text-primary backdrop-blur-sm rounded-full">
+          <motion.div
+            className="absolute top-4 left-4"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.12 + 0.2 }}
+          >
+            <span className="px-3 py-1 text-xs font-semibold bg-gradient-to-r from-primary/30 to-accent/30 text-primary backdrop-blur-md rounded-full border border-primary/40">
               {project.category}
             </span>
-          </div>
+          </motion.div>
 
-          {/* Quick links */}
+          {/* Icon overlay */}
           <motion.div
-            className="absolute top-4 right-4 flex gap-2"
+            className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : 10 }}
             transition={{ duration: 0.2 }}
           >
+            {project.featured && (
+              <motion.div
+                whileHover={{ scale: 1.2, rotate: 360 }}
+                className="p-2 bg-amber-500/20 backdrop-blur-md rounded-lg text-amber-400 border border-amber-500/30"
+              >
+                <Star className="w-4 h-4 fill-current" />
+              </motion.div>
+            )}
             {project.githubUrl && (
-              <a
+              <motion.a
                 href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="p-2 bg-background/80 backdrop-blur-sm rounded-lg text-foreground hover:text-primary transition-colors"
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-2 bg-background/60 backdrop-blur-md rounded-lg text-foreground hover:text-primary transition-colors border border-border/50"
               >
                 <Github className="w-4 h-4" />
-              </a>
+              </motion.a>
             )}
             {project.demoUrl && (
-              <a
+              <motion.a
                 href={project.demoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="p-2 bg-background/80 backdrop-blur-sm rounded-lg text-foreground hover:text-primary transition-colors"
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-2 bg-background/60 backdrop-blur-md rounded-lg text-foreground hover:text-primary transition-colors border border-border/50"
               >
                 <ExternalLink className="w-4 h-4" />
-              </a>
+              </motion.a>
             )}
           </motion.div>
         </div>
 
-        {/* Content */}
+        {/* Content section */}
         <div className="p-6" style={{ transform: "translateZ(30px)" }}>
-          <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+          {/* Title */}
+          <motion.h3
+            className="text-xl font-bold text-foreground mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-accent group-hover:bg-clip-text transition-all"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.12 + 0.1 }}
+          >
             {project.title}
-          </h3>
-          <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-            {project.description}
-          </p>
+          </motion.h3>
 
-          {/* Tech stack */}
-          <div className="flex flex-wrap gap-2">
-            {project.techStack.slice(0, 3).map((tech) => (
-              <span
+          {/* Description */}
+          <motion.p
+            className="text-sm text-muted-foreground mb-4 line-clamp-2 group-hover:text-muted-foreground/80"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.12 + 0.15 }}
+          >
+            {project.description}
+          </motion.p>
+
+          {/* Tech stack tags */}
+          <motion.div
+            className="flex flex-wrap gap-2 mb-5"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.12 + 0.2 }}
+          >
+            {project.techStack.slice(0, 3).map((tech, i) => (
+              <motion.span
                 key={tech}
-                className="px-2 py-1 text-xs bg-secondary text-secondary-foreground rounded-md"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.12 + 0.25 + i * 0.05 }}
+                className="px-2.5 py-1 text-xs font-medium bg-primary/10 text-primary rounded-md border border-primary/20 group-hover:border-primary/50 transition-colors"
               >
                 {tech}
-              </span>
+              </motion.span>
             ))}
             {project.techStack.length > 3 && (
-              <span className="px-2 py-1 text-xs bg-secondary text-muted-foreground rounded-md">
+              <span className="px-2.5 py-1 text-xs font-medium bg-primary/10 text-primary rounded-md">
                 +{project.techStack.length - 3}
               </span>
             )}
-          </div>
-        </div>
+          </motion.div>
 
-        {/* Pulse glow indicator */}
-        <motion.div
-          className="absolute bottom-4 right-4 w-2 h-2 rounded-full bg-primary"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        />
+          {/* CTA Button */}
+          <motion.button
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick();
+            }}
+            whileHover={{ scale: 1.02, gap: "8px" }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full py-2.5 px-4 bg-gradient-to-r from-primary to-accent text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 group-hover:gap-3"
+          >
+            <span>View Project</span>
+            <motion.span
+              animate={isHovered ? { x: 2 } : { x: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Zap className="w-4 h-4" />
+            </motion.span>
+          </motion.button>
+        </div>
       </motion.div>
     </motion.div>
   );

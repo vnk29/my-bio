@@ -18,7 +18,7 @@ export const useProjectsApi = () => {
   const { data: projects = [], isLoading, refetch } = useQuery<ApiProject[]>({
     queryKey: ['projects-api'],
     queryFn: async () => {
-      const res = await fetch(`${API}/api/projects`);
+      const res = await fetch(`${API}/projects`);
       if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
     },

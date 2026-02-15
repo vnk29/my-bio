@@ -43,7 +43,7 @@ export const useSiteContent = () => {
   const { data, isLoading, refetch } = useQuery<SiteContent>({
     queryKey: ['site-content'],
     queryFn: async () => {
-      const res = await fetch(`${API}/api/site-content`);
+      const res = await fetch(`${API}/site-content`);
       if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
     },

@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const jwt = require('jsonwebtoken');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
@@ -42,24 +43,29 @@ app.use(cors({ origin: ['http://localhost:8080', 'http://localhost:8081', 'http:
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use('/uploads', express.static(uploadsDir));
 
-const sessions = {};
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASS = process.env.ADMIN_PASS || 'admin123';
 
 function requireAuth(req, res, next) {
   const token = req.headers['authorization'];
-  if (!token || !sessions[token]) {
+  if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
-  next();
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
 }
 
 // ========== AUTH ==========
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   if (username === ADMIN_USER && password === ADMIN_PASS) {
-    const token = crypto.randomBytes(24).toString('hex');
-    sessions[token] = { username, created: Date.now() };
+    const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '30d' });
     res.json({ token });
   } else {
     res.status(401).json({ error: 'Invalid credentials' });
@@ -67,7 +73,7 @@ app.post('/api/login', (req, res) => {
 });
 
 app.post('/api/logout', requireAuth, (req, res) => {
-  delete sessions[req.headers['authorization']];
+  // JWT logout is client-side (just remove the token)
   res.json({ success: true });
 });
 

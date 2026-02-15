@@ -12,20 +12,29 @@ const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 
+// Get environment variables with fallbacks
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
+const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+const ADMIN_PASS = process.env.ADMIN_PASS || 'admin123';
+
 // Log environment variables for debugging
 console.log('📋 Environment Check:');
-console.log('SUPABASE_URL:', process.env.SUPABASE_URL ? '✅ Set' : '❌ Missing');
-console.log('SUPABASE_KEY:', process.env.SUPABASE_KEY ? '✅ Set' : '❌ Missing');
-console.log('ADMIN_USER:', process.env.ADMIN_USER || 'admin');
+console.log('SUPABASE_URL:', SUPABASE_URL ? '✅ Set' : '❌ Missing');
+console.log('SUPABASE_KEY:', SUPABASE_KEY ? '✅ Set' : '❌ Missing');
+console.log('JWT_SECRET:', JWT_SECRET ? '✅ Set' : '❌ Missing');
+console.log('ADMIN_USER:', ADMIN_USER);
 console.log('PORT:', process.env.PORT || 4000);
 
 // Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
-
-console.log('🔌 Supabase client initialized');
+let supabase = null;
+if (SUPABASE_URL && SUPABASE_KEY) {
+  supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  console.log('🔌 Supabase client initialized');
+} else {
+  console.warn('⚠️  Supabase credentials missing - some features will not work');
+}
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, '../public/uploads');
@@ -42,10 +51,6 @@ const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 app.use(cors({ origin: true, credentials: true }));
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use('/uploads', express.static(uploadsDir));
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
-const ADMIN_USER = process.env.ADMIN_USER || 'admin';
-const ADMIN_PASS = process.env.ADMIN_PASS || 'admin123';
 
 function requireAuth(req, res, next) {
   const token = req.headers['authorization'];
@@ -80,6 +85,9 @@ app.post('/api/logout', requireAuth, (req, res) => {
 // ========== SITE CONTENT (public) ==========
 app.get('/api/site-content', async (req, res) => {
   try {
+    if (!supabase) {
+      return res.status(503).json({ error: 'Database service unavailable' });
+    }
     const { data, error } = await supabase
       .from('site_content')
       .select('*')

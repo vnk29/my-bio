@@ -1,12 +1,13 @@
 // Backend server for V NOHITH KUMAR's portfolio - Full CMS with Supabase
-require('dotenv').config();
+try {
+  require('dotenv').config();
+} catch (e) {
+  console.log('dotenv not available (normal on Vercel)');
+}
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const crypto = require('crypto');
-const path = require('path');
-const fs = require('fs');
-const multer = require('multer');
 const jwt = require('jsonwebtoken');
 const { createClient } = require('@supabase/supabase-js');
 
@@ -19,13 +20,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-pro
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASS = process.env.ADMIN_PASS || 'admin123';
 
-// Log environment variables for debugging
 console.log('📋 Environment Check:');
 console.log('SUPABASE_URL:', SUPABASE_URL ? '✅ Set' : '❌ Missing');
 console.log('SUPABASE_KEY:', SUPABASE_KEY ? '✅ Set' : '❌ Missing');
 console.log('JWT_SECRET:', JWT_SECRET ? '✅ Set' : '❌ Missing');
 console.log('ADMIN_USER:', ADMIN_USER);
-console.log('PORT:', process.env.PORT || 4000);
 
 // Initialize Supabase client
 let supabase = null;
@@ -40,21 +39,9 @@ try {
   console.error('❌ Failed to initialize Supabase:', err.message);
 }
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '../public/uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + (file.originalname || 'image')),
-});
-const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
-
+// Middleware
 app.use(cors({ origin: true, credentials: true }));
 app.use(bodyParser.json({ limit: '10mb' }));
-app.use('/uploads', express.static(uploadsDir));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -339,6 +326,16 @@ app.get('/api/analytics', requireAuth, async (req, res) => {
 app.use((err, req, res, next) => {
   console.error('Express error:', err);
   res.status(500).json({ error: 'Internal server error' });
+});
+
+// Export for Vercel serverless
+module.exports = app;
+
+// For local development
+// ========== ERROR HANDLING ==========
+app.use((err, req, res, next) => {
+  console.error('Express error:', err);
+  res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 
 // Export for Vercel serverless
